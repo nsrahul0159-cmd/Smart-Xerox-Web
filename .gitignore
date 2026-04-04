@@ -1,0 +1,42 @@
+# Root level gitignore
+
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+
+# Environment variables (CRITICAL - never commit!)
+.env
+.env.local
+.env.*.local
+backend/.env
+frontend/.env
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Operating System
+.DS_Store
+Thumbs.db
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+
+# Backend uploads
+backend/uploads/
+
+# Cache
+.cache/
+.eslintcache
