@@ -40,7 +40,7 @@ export default function AdminDashboard() {
       setOrders(ordersRes.data);
     } catch (err) {
       console.error(err);
-      if (err.response?.status === 401) {
+      if (axios.isAxiosError(err) && err.response?.status === 401) {
         setIsAuthenticated(false);
         localStorage.removeItem('adminToken');
       }
@@ -63,7 +63,7 @@ export default function AdminDashboard() {
       fetchDashboardData(); // Refresh list
     } catch (err) {
       alert("Failed to update status");
-      if (err.response?.status === 401) {
+      if (axios.isAxiosError(err) && err.response?.status === 401) {
         setIsAuthenticated(false);
         localStorage.removeItem('adminToken');
       }
