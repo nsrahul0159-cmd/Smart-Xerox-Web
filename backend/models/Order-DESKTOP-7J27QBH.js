@@ -25,6 +25,7 @@ const orderSchema = new mongoose.Schema({
     enum: ['Payment Pending', 'Paid', 'Pending', 'Printing', 'Completed', 'Delivered'],
     default: 'Payment Pending'
   },
+  displayId: { type: String },
   createdAt: { type: Date, default: Date.now }
 });
 

@@ -1,4 +1,8 @@
 import express from 'express';
+import dns from 'dns';
+
+// Fix for MongoDB DNS SRV query issue (often happens on certain ISPs where default DNS drops SRV query)
+dns.setServers(['8.8.8.8', '8.8.4.4']);
 import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -32,6 +36,10 @@ app.use('/api/admin', adminRoutes);
 // Health check
 app.get('/', (req, res) => {
   res.send('Smart Xerox API is running!');
+});
+
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', message: 'Smart Xerox API is running!' });
 });
 
 // Database connection
