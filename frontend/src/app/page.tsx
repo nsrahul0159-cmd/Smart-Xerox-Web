@@ -95,7 +95,8 @@ export default function Home() {
     } catch (err: any) {
       console.error(err);
       const errorMsg = err.response?.data?.error || err.message || 'Unknown error';
-      alert(`Error uploading files: ${errorMsg}\n\nTechnical details: ${err.code || 'Check console'}. Please ensure the backend is running and reachable.`);
+      const targetUrl = process.env.NEXT_PUBLIC_API_URL || 'UNDEFINED';
+      alert(`Error uploading files: ${errorMsg}\n\nTarget API: ${targetUrl}\nTechnical details: ${err.code || 'Check console'}. Please ensure the backend is running and reachable.`);
     } finally {
       setIsUploading(false);
     }
