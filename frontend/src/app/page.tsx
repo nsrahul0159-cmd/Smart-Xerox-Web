@@ -70,20 +70,23 @@ export default function Home() {
     });
 
     try {
-      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/upload`, formData, {
-        timeout: 120000, // 2 minutes for slow mobile uploads
-        onUploadProgress: (progressEvent) => {
-          if (progressEvent.total) {
-            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-            console.log(`Upload progress: ${percentCompleted}%`);
-          }
-        }
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload`, {
+        method: 'POST',
+        body: formData,
+        // Fetch doesn't set a timeout by default, so we'll let it run
       });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+      }
+
+      const resData = await response.json();
       
-      const sessionNewPages = res.data.totalPages;
+      const sessionNewPages = resData.totalPages;
       
       // Update state with new files and total page count
-      setUploadedFiles(prev => [...prev, ...res.data.files]);
+      setUploadedFiles(prev => [...prev, ...resData.files]);
       
       let updatedTotal = 0;
       setTotalPages(prev => {
