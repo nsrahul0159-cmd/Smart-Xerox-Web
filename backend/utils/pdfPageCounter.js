@@ -1,5 +1,7 @@
 import fs from 'fs';
-import pdfParse from 'pdf-parse/lib/index.js';
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+const pdfParse = require('pdf-parse');
 
 export const countPdfPages = async (filePath) => {
   try {
