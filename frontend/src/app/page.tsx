@@ -27,6 +27,26 @@ export default function Home() {
   const [orderCreated, setOrderCreated] = useState<any>(null);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [apiStatus, setApiStatus] = useState<'checking' | 'ok' | 'fail'>('checking');
+
+  useEffect(() => {
+    // Basic health check to see if we can reach the backend
+    const checkApi = async () => {
+      try {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+        console.log('Testing connection to:', apiUrl);
+        // The root URL points to the running message
+        const baseUrl = apiUrl.endsWith('/api') ? apiUrl.slice(0, -4) : apiUrl;
+        await axios.get(baseUrl + '/');
+        setApiStatus('ok');
+        console.log('API is reachable!');
+      } catch (err) {
+        console.error('API health check failed:', err);
+        setApiStatus('fail');
+      }
+    };
+    checkApi();
+  }, []);
 
   // Derive price logic on client locally for the QR
   const calculatePrice = () => {
@@ -72,9 +92,10 @@ export default function Home() {
         newSuggestions.push({ type: 'color', val: 'B/W', message: 'If mostly text, B/W is 10x cheaper.' });
       }
       setSuggestions(newSuggestions);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert('Error uploading files. Please check if the backend is running.');
+      const errorMsg = err.response?.data?.error || err.message || 'Unknown error';
+      alert(`Error uploading files: ${errorMsg}\n\nTechnical details: ${err.code || 'Check console'}. Please ensure the backend is running and reachable.`);
     } finally {
       setIsUploading(false);
     }
@@ -145,6 +166,15 @@ export default function Home() {
   return (
     <div className="flex flex-col lg:flex-row gap-8 pb-32">
       <div className="flex-1 space-y-8 min-w-0">
+        {apiStatus === 'fail' && (
+          <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl flex items-center gap-3">
+            <span className="text-xl">⚠️</span>
+            <div className="text-sm">
+              <p className="font-bold">Backend Unreachable</p>
+              <p>The app can't talk to the printer server. If you're on a phone, make sure you're on the same Wi-Fi or the URL is correct.</p>
+            </div>
+          </div>
+        )}
         {/* User Info */}
         <section className="glass-panel p-6 rounded-2xl space-y-4">
           <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">User Details</h2>
