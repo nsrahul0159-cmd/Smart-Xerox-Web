@@ -19,7 +19,8 @@ export default function TrackOrder() {
 
     setLoading(true);
     try {
-      const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/orders/track/${phone}`);
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || '/api-backend';
+      const res = await axios.get(`${apiUrl}/orders/track/${phone}`);
       setOrders(res.data);
       setHasSearched(true);
     } catch (err) {
