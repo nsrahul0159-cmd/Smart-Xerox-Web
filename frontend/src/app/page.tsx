@@ -48,11 +48,13 @@ export default function Home() {
 
     try {
       const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/upload`, formData);
-      setUploadedFiles([...uploadedFiles, ...res.data.files]);
-      const newTotal = totalPages + res.data.totalPages;
-      setTotalPages(newTotal);
+      
+      // Update state with new files and total page count
+      setUploadedFiles(prev => [...prev, ...res.data.files]);
+      setTotalPages(prev => prev + res.data.totalPages);
 
       // Simple AI Logic on client side
+      const newTotal = totalPages + res.data.totalPages;
       const newSuggestions = [];
       if (newTotal > 20 && settings.sides === 'Single Side') {
         newSuggestions.push({ type: 'sides', val: 'Double Side', message: 'Print double-sided to save 50% paper.' });
@@ -75,6 +77,21 @@ export default function Home() {
   const handleApplySuggestion = (type: string, val: string) => {
     setSettings({ ...settings, [type]: val });
     setSuggestions(suggestions.filter(s => s.type !== type));
+  };
+
+  const handleFileRemove = (idx: number) => {
+    const fileToRemove = uploadedFiles[idx];
+    if (fileToRemove && fileToRemove.pages) {
+      setTotalPages(prev => Math.max(0, prev - fileToRemove.pages));
+    }
+    
+    const newFiles = [...files];
+    newFiles.splice(idx, 1);
+    setFiles(newFiles);
+    
+    const newUploadedFiles = [...uploadedFiles];
+    newUploadedFiles.splice(idx, 1);
+    setUploadedFiles(newUploadedFiles);
   };
 
   const handlePlaceOrder = async () => {
@@ -149,11 +166,7 @@ export default function Home() {
           <FileUpload 
             files={files} 
             onFilesAdded={handleFilesAdded} 
-            onFileRemove={(idx) => {
-              const newFiles = [...files];
-              newFiles.splice(idx, 1);
-              setFiles(newFiles);
-            }} 
+            onFileRemove={handleFileRemove} 
           />
           {isUploading && <p className="text-sm text-indigo-600 mt-2 animate-pulse">Uploading and processing PDFs...</p>}
         </section>
