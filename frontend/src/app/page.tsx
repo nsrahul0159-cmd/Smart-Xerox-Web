@@ -217,13 +217,38 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Upload */}
-        <section>
-          <FileUpload 
-            files={files} 
-            onFilesAdded={handleFilesAdded} 
-            onFileRemove={handleFileRemove} 
-          />
+        {/* Upload Section - Blocked while checking API */}
+        <section className="relative">
+          <div className={`${apiStatus !== 'ok' ? 'opacity-50 pointer-events-none grayscale' : ''} transition-all duration-500`}>
+            <FileUpload 
+              files={files} 
+              onFilesAdded={handleFilesAdded} 
+              onFileRemove={handleFileRemove} 
+            />
+          </div>
+
+          {/* Wake-up Status Overlay */}
+          {apiStatus === 'checking' && (
+            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/60 dark:bg-slate-900/60 backdrop-blur-[2px] rounded-2xl border-2 border-dashed border-indigo-200 dark:border-indigo-900/50">
+              <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mb-4" />
+              <p className="text-sm font-bold text-indigo-700 dark:text-indigo-400 animate-pulse">Waking up printer server...</p>
+              <p className="text-[10px] text-gray-500 mt-1 uppercase tracking-widest font-mono">Taking ~30-50 seconds</p>
+            </div>
+          )}
+
+          {apiStatus === 'fail' && (
+            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-red-50/90 dark:bg-red-950/90 backdrop-blur-[2px] rounded-2xl border-2 border-dashed border-red-200 dark:border-red-900">
+              <span className="text-2xl mb-2">⚠️</span>
+              <p className="text-sm font-bold text-red-700 dark:text-red-400 text-center px-6">Still can't reach the server.</p>
+              <button 
+                onClick={() => window.location.reload()}
+                className="mt-3 text-xs font-bold bg-red-600 text-white px-4 py-2 rounded-xl"
+              >
+                Retry Manually
+              </button>
+            </div>
+          )}
+
           {isUploading && (
             <div className="mt-4 space-y-2">
               <div className="w-full bg-gray-200 dark:bg-slate-800 rounded-full h-2.5 overflow-hidden">
@@ -239,7 +264,6 @@ export default function Home() {
               </p>
             </div>
           )}
-          {apiStatus === 'checking' && <p className="text-sm text-gray-500 mt-2 animate-pulse flex items-center gap-2">🔄 Waking up printer server... (Taking ~30s)</p>}
         </section>
 
         {/* Print Settings */}

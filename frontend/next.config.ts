@@ -12,6 +12,10 @@ const nextConfig: NextConfig = {
         source: '/api-backend/:path*',
         destination: 'https://smart-xerox-web.onrender.com/api/:path*',
       },
+      {
+        source: '/uploads-backend/:path*',
+        destination: 'https://smart-xerox-web.onrender.com/uploads/:path*',
+      },
     ];
   },
 };

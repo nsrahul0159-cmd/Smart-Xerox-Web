@@ -215,7 +215,7 @@ export default function AdminDashboard() {
                 {col.files?.map((f: any, i: number) => (
                   <a 
                     key={i} 
-                    href={`${(process.env.NEXT_PUBLIC_API_URL || '/api-backend').replace('/api-backend', '/api')}/uploads/${f.filename}`} 
+                    href={`/uploads-backend/${f.filename}`} 
                     target="_blank" 
                     rel="noreferrer"
                     className="text-[10px] bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 px-2 py-1 rounded flex items-center gap-1 font-bold"
@@ -283,7 +283,7 @@ export default function AdminDashboard() {
                       {col.files?.map((f: any, i: number) => (
                         <a 
                           key={i} 
-                          href={`${(process.env.NEXT_PUBLIC_API_URL || '/api-backend').replace('/api-backend', '/api')}/uploads/${f.filename}`} 
+                          href={`/uploads-backend/${f.filename}`} 
                           target="_blank" 
                           rel="noreferrer"
                           className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1 font-bold bg-indigo-50 dark:bg-indigo-900/30 px-2 py-1 rounded w-max"
