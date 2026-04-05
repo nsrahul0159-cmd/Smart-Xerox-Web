@@ -9,7 +9,7 @@ export const countPdfPages = async (filePath) => {
     const data = await pdfParse(dataBuffer);
     return data.numpages;
   } catch (error) {
-    console.error('Error parsing PDF:', error);
-    return 1; // Default fallback just in case
+    console.error('Error parsing PDF at path:', filePath, error);
+    throw new Error('Could not read PDF pages. Please ensure the file is a valid PDF.');
   }
 };
