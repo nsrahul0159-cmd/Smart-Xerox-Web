@@ -49,20 +49,26 @@ export default function Home() {
     try {
       const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/upload`, formData);
       
+      const sessionNewPages = res.data.totalPages;
+      
       // Update state with new files and total page count
       setUploadedFiles(prev => [...prev, ...res.data.files]);
-      setTotalPages(prev => prev + res.data.totalPages);
+      
+      let updatedTotal = 0;
+      setTotalPages(prev => {
+        updatedTotal = prev + sessionNewPages;
+        return updatedTotal;
+      });
 
-      // Simple AI Logic on client side
-      const newTotal = totalPages + res.data.totalPages;
+      // Simple AI Logic based on the NEW total
       const newSuggestions = [];
-      if (newTotal > 20 && settings.sides === 'Single Side') {
+      if (updatedTotal > 20 && settings.sides === 'Single Side') {
         newSuggestions.push({ type: 'sides', val: 'Double Side', message: 'Print double-sided to save 50% paper.' });
       }
-      if (newTotal > 50 && settings.layout === '1') {
+      if (updatedTotal > 50 && settings.layout === '1') {
         newSuggestions.push({ type: 'layout', val: '1/2', message: 'Use 2 Pages per Sheet to drastically reduce cost.' });
       }
-      if (settings.color === 'Color' && newTotal > 10) {
+      if (settings.color === 'Color' && updatedTotal > 10) {
         newSuggestions.push({ type: 'color', val: 'B/W', message: 'If mostly text, B/W is 10x cheaper.' });
       }
       setSuggestions(newSuggestions);
