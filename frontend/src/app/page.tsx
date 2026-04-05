@@ -66,7 +66,7 @@ export default function Home() {
       setSuggestions(newSuggestions);
     } catch (err) {
       console.error(err);
-      alert('Error uploading files. Make sure backend is running on port 5000.');
+      alert('Error uploading files. Please check if the backend is running.');
     } finally {
       setIsUploading(false);
     }
