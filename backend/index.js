@@ -33,9 +33,8 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/admin', adminRoutes);
 
-// Health check
-app.get('/', (req, res) => {
-  res.send('Smart Xerox API is running!');
+app.get('/api', (req, res) => {
+  res.status(200).json({ message: 'Smart Xerox API is running and reachable via proxy!' });
 });
 
 // Database connection

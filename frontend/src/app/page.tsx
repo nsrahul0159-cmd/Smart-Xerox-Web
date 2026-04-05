@@ -35,9 +35,8 @@ export default function Home() {
       try {
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
         console.log('Testing connection to:', apiUrl);
-        // The root URL points to the running message
-        const baseUrl = apiUrl.endsWith('/api') ? apiUrl.slice(0, -4) : apiUrl;
-        await axios.get(baseUrl + '/');
+        // Hit the API URL directly
+        await axios.get(apiUrl);
         setApiStatus('ok');
         console.log('API is reachable!');
       } catch (err) {
