@@ -38,4 +38,22 @@ router.get('/orders', async (req, res) => {
   }
 });
 
+// Admin login (Simplified)
+router.post('/login', (req, res) => {
+  try {
+    const { username, password } = req.body;
+    // For production, use environment variables!
+    const ADMIN_USER = process.env.ADMIN_USER || 'admin';
+    const ADMIN_PASS = process.env.ADMIN_PASS || 'SmartXerox@2026';
+
+    if (username === ADMIN_USER && password === ADMIN_PASS) {
+      res.status(200).json({ success: true, message: 'Logged in successfully' });
+    } else {
+      res.status(401).json({ error: 'Invalid credentials' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'Login failed' });
+  }
+});
+
 export default router;

@@ -43,4 +43,16 @@ router.put('/:id/status', async (req, res) => {
   }
 });
 
+// Track orders by phone
+router.get('/track/:phone', async (req, res) => {
+  try {
+    const { phone } = req.params;
+    const orders = await Order.find({ 'user.phone': phone }).sort({ createdAt: -1 });
+    res.status(200).json(orders);
+  } catch (err) {
+    console.error('Tracking Error:', err);
+    res.status(500).json({ error: 'Failed to track orders.' });
+  }
+});
+
 export default router;
