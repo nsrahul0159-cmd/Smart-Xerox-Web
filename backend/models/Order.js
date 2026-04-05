@@ -19,6 +19,7 @@ const orderSchema = new mongoose.Schema({
     copies: { type: Number, default: 1 },
     layout: { type: String, enum: ['1', '1/2', '1/4'], default: '1' }
   },
+  displayId: { type: String, unique: true },
   amount: { type: Number, required: true },
   status: {
     type: String,

@@ -10,13 +10,24 @@ router.post('/', async (req, res) => {
     const { user, files, totalPages, settings } = req.body;
 
     const amount = calculatePrice(totalPages, settings);
+    
+    // Generate date-reset serial ID: SX-YYYYMMDD-1
+    const today = new Date();
+    const dateStr = today.toISOString().split('T')[0].replace(/-/g, ''); // 20240405
+    
+    // Count orders created TODAY
+    const startOfToday = new Date(today.setHours(0, 0, 0, 0));
+    const countToday = await Order.countDocuments({ createdAt: { $gte: startOfToday } });
+    
+    const displayId = `SX-${dateStr}-${countToday + 1}`;
 
     const newOrder = new Order({
       user,
       files,
       totalPages,
       settings,
-      amount
+      amount,
+      displayId
     });
 
     await newOrder.save();

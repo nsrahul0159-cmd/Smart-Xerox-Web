@@ -22,7 +22,13 @@ app.use(cors({
 }));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Static files for uploads with proper headers for downloads
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'), {
+  setHeaders: (res) => {
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Content-Disposition', 'inline'); // Ensure it opens/downloads correctly
+  }
+}));
 
 // Routes
 import uploadRoutes from './routes/uploadRoutes.js';
