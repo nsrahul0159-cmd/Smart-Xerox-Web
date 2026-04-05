@@ -1,5 +1,5 @@
 import fs from 'fs';
-import pdfParse from 'pdf-parse';
+import pdfParse from 'pdf-parse/lib/index.js';
 
 export const countPdfPages = async (filePath) => {
   try {
