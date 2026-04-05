@@ -64,10 +64,21 @@ export default function Home() {
     
     // Auto-upload
     const formData = new FormData();
-    newFiles.forEach((f) => formData.append('files', f));
+    newFiles.forEach((f) => {
+      // Explicitly passing the name helps some mobile browsers
+      formData.append('files', f, f.name);
+    });
 
     try {
-      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/upload`, formData);
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/upload`, formData, {
+        timeout: 120000, // 2 minutes for slow mobile uploads
+        onUploadProgress: (progressEvent) => {
+          if (progressEvent.total) {
+            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            console.log(`Upload progress: ${percentCompleted}%`);
+          }
+        }
+      });
       
       const sessionNewPages = res.data.totalPages;
       
