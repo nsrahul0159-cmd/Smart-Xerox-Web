@@ -191,59 +191,120 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Orders Table */}
-      <div className="glass-panel rounded-2xl overflow-hidden mt-8 border border-white/50 dark:border-slate-800">
+      {/* Mobile Orders List */}
+      <div className="lg:hidden space-y-4">
+        {orders.map((col) => (
+          <div key={col._id} className="glass-panel p-5 rounded-2xl border border-white/50 dark:border-slate-800 shadow-sm">
+            <div className="flex justify-between items-start mb-3">
+              <div>
+                <p className="text-[10px] font-mono text-indigo-500 uppercase">{col.displayId || col._id.substring(col._id.length - 8)}</p>
+                <h3 className="font-bold text-gray-800 dark:text-gray-100">{col.user.name}</h3>
+                <p className="text-xs text-gray-500">{col.user.phone}</p>
+              </div>
+              <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase
+                ${col.status === 'Paid' ? 'bg-indigo-100 text-indigo-700' : 
+                  col.status === 'Completed' ? 'bg-emerald-100 text-emerald-700' : 
+                  col.status === 'Payment Pending' ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-700'}
+              `}>
+                {col.status}
+              </span>
+            </div>
+            
+            <div className="space-y-3 pb-3 border-b border-gray-100 dark:border-slate-800">
+              <div className="flex flex-wrap gap-2">
+                {col.files?.map((f: any, i: number) => (
+                  <a 
+                    key={i} 
+                    href={`${(process.env.NEXT_PUBLIC_API_URL || '/api-backend').replace('/api-backend', '/api')}/uploads/${f.filename}`} 
+                    target="_blank" 
+                    rel="noreferrer"
+                    className="text-[10px] bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 px-2 py-1 rounded flex items-center gap-1 font-bold"
+                  >
+                    <FileText className="w-3 h-3" />
+                    File {i + 1}
+                  </a>
+                ))}
+              </div>
+              <div className="flex justify-between items-end">
+                 <div className="flex gap-2 text-[10px] font-bold text-gray-500 uppercase">
+                    <span>{col.totalPages} pgs</span>
+                    <span>{col.settings.color}</span>
+                    <span>{col.settings.sides}</span>
+                 </div>
+                 <p className="font-bold text-lg text-indigo-600">₹{col.amount}</p>
+              </div>
+            </div>
+
+            <div className="pt-3">
+               <select 
+                value={col.status} 
+                onChange={(e) => updateStatus(col._id, e.target.value)}
+                className="w-full text-xs px-3 py-2.5 border rounded-xl bg-white dark:bg-slate-900 dark:border-slate-800 outline-none font-semibold"
+              >
+                <option value="Payment Pending">Payment Pending</option>
+                <option value="Paid">Paid</option>
+                <option value="Printing">Printing</option>
+                <option value="Completed">Completed</option>
+                <option value="Delivered">Delivered</option>
+              </select>
+            </div>
+          </div>
+        ))}
+        {orders.length === 0 && <p className="text-center py-10 text-gray-500">No orders found.</p>}
+      </div>
+
+      {/* Desktop Orders Table */}
+      <div className="hidden lg:block glass-panel rounded-2xl overflow-hidden mt-8 border border-white/50 dark:border-slate-800">
         <div className="px-6 py-4 border-b border-gray-100 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50">
           <h2 className="font-semibold text-lg">Recent Orders</h2>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="bg-gray-50/50 dark:bg-slate-800/50 text-gray-500">
+            <thead className="bg-gray-50/50 dark:bg-slate-800/50 text-gray-500 uppercase text-[10px] font-bold">
               <tr>
-                <th className="px-6 py-4 font-medium">Customer</th>
-                <th className="px-6 py-4 font-medium">Files / Pages</th>
-                <th className="px-6 py-4 font-medium">Settings</th>
-                <th className="px-6 py-4 font-medium">Amount</th>
-                <th className="px-6 py-4 font-medium">Status</th>
-                <th className="px-6 py-4 font-medium text-right">Actions</th>
+                <th className="px-6 py-4">Customer</th>
+                <th className="px-6 py-4">Files / Pages</th>
+                <th className="px-6 py-4 text-center">Settings</th>
+                <th className="px-6 py-4 text-center">Amount</th>
+                <th className="px-6 py-4 text-center">Status</th>
+                <th className="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 dark:divide-slate-800">
               {orders.map((col) => (
                 <tr key={col._id} className="hover:bg-gray-50/50 dark:hover:bg-slate-800/30 transition-colors">
                   <td className="px-6 py-4">
-                    <p className="text-xs font-mono text-indigo-600 dark:text-indigo-400 mb-1">{col.displayId || col._id.substring(col._id.length - 8)}</p>
-                    <p className="font-medium text-gray-800 dark:text-gray-200">{col.user.name}</p>
+                    <p className="text-[10px] font-mono text-indigo-600 dark:text-indigo-400 mb-1">{col.displayId || col._id.substring(col._id.length - 8)}</p>
+                    <p className="font-bold text-gray-800 dark:text-gray-200">{col.user.name}</p>
                     <p className="text-xs text-gray-500">{col.user.phone}</p>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-1.5">
                       {col.files?.map((f: any, i: number) => (
                         <a 
                           key={i} 
-                          href={`${(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api').replace('/api', '')}/uploads/${f.filename}`} 
+                          href={`${(process.env.NEXT_PUBLIC_API_URL || '/api-backend').replace('/api-backend', '/api')}/uploads/${f.filename}`} 
                           target="_blank" 
                           rel="noreferrer"
-                          className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1 font-medium bg-indigo-50 dark:bg-indigo-900/30 px-2 py-1 rounded w-max"
+                          className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1 font-bold bg-indigo-50 dark:bg-indigo-900/30 px-2 py-1 rounded w-max"
                         >
                           <FileText className="w-3 h-3" />
-                          Download File {i + 1}
+                          File {i + 1}
                         </a>
                       ))}
                     </div>
-                    <p className="text-xs text-gray-500 mt-3 border-t border-gray-100 dark:border-slate-700 pt-2">{col.totalPages} total pgs</p>
+                    <p className="text-[10px] text-gray-400 mt-2 font-bold uppercase">{col.totalPages} total pages</p>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="flex flex-wrap gap-1 text-xs">
-                      <span className="px-2 py-1 bg-gray-100 dark:bg-slate-700 rounded-md">{col.settings.color}</span>
-                      <span className="px-2 py-1 bg-gray-100 dark:bg-slate-700 rounded-md">{col.settings.sides}</span>
-                      <span className="px-2 py-1 bg-gray-100 dark:bg-slate-700 rounded-md">Lay: {col.settings.layout}</span>
-                      <span className="px-2 py-1 bg-gray-100 dark:bg-slate-700 rounded-md">x{col.settings.copies}</span>
+                    <div className="flex flex-wrap justify-center gap-1 text-[10px] font-bold uppercase">
+                      <span className="px-1.5 py-0.5 bg-gray-100 dark:bg-slate-700 rounded">{col.settings.color}</span>
+                      <span className="px-1.5 py-0.5 bg-gray-100 dark:bg-slate-700 rounded">{col.settings.sides}</span>
+                      <span className="px-1.5 py-0.5 bg-gray-800 text-white rounded">x{col.settings.copies}</span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 font-semibold">₹{col.amount}</td>
-                  <td className="px-6 py-4">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium 
+                  <td className="px-6 py-4 font-bold text-center">₹{col.amount}</td>
+                  <td className="px-6 py-4 text-center">
+                    <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase
                       ${col.status === 'Paid' ? 'bg-indigo-100 text-indigo-700' : 
                         col.status === 'Completed' ? 'bg-emerald-100 text-emerald-700' : 
                         col.status === 'Payment Pending' ? 'bg-amber-100 text-amber-700' : 'bg-gray-100 text-gray-700'}
@@ -251,11 +312,11 @@ export default function AdminDashboard() {
                       {col.status}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-right space-x-2">
+                  <td className="px-6 py-4 text-right">
                     <select 
                       value={col.status} 
                       onChange={(e) => updateStatus(col._id, e.target.value)}
-                      className="text-xs px-2 py-1 border rounded bg-white dark:bg-slate-800 dark:border-slate-700 outline-none"
+                      className="text-xs px-2 py-1.5 border rounded-xl bg-white dark:bg-slate-800 dark:border-slate-700 outline-none font-semibold transition-all focus:ring-2 focus:ring-indigo-500"
                     >
                       <option value="Payment Pending">Payment Pending</option>
                       <option value="Paid">Paid</option>
@@ -268,8 +329,8 @@ export default function AdminDashboard() {
               ))}
               {orders.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center text-gray-500">
-                    No orders found.
+                  <td colSpan={6} className="px-6 py-10 text-center text-gray-500 font-medium">
+                    No active orders found.
                   </td>
                 </tr>
               )}
