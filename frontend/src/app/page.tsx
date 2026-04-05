@@ -31,17 +31,22 @@ export default function Home() {
 
   useEffect(() => {
     // Basic health check to see if we can reach the backend
-    const checkApi = async () => {
+    const checkApi = async (retries = 3) => {
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || '/api-backend';
         console.log('Testing connection to:', apiUrl);
-        // Hit the API URL directly
+        // Hit the health-check path
         await axios.get(apiUrl);
         setApiStatus('ok');
         console.log('API is reachable!');
       } catch (err) {
         console.error('API health check failed:', err);
-        setApiStatus('fail');
+        if (retries > 0) {
+          console.log(`Retrying in 5s... (${retries} retries left)`);
+          setTimeout(() => checkApi(retries - 1), 5000);
+        } else {
+          setApiStatus('fail');
+        }
       }
     };
     checkApi();
@@ -57,31 +62,31 @@ export default function Home() {
     return sheetsNeeded * basePrice * settings.copies;
   };
 
+  const [uploadProgress, setUploadProgress] = useState(0);
+
   const handleFilesAdded = async (newFiles: File[]) => {
     setFiles([...files, ...newFiles]);
     setIsUploading(true);
+    setUploadProgress(0);
     
     // Auto-upload
     const formData = new FormData();
     newFiles.forEach((f) => {
-      // Explicitly passing the name helps some mobile browsers
       formData.append('files', f, f.name);
     });
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/upload`, {
-        method: 'POST',
-        body: formData,
-        // Fetch doesn't set a timeout by default, so we'll let it run
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL || '/api-backend'}/upload`, formData, {
+        onUploadProgress: (progressEvent) => {
+          if (progressEvent.total) {
+            const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            setUploadProgress(percent);
+          }
+        },
+        timeout: 120000 // 2 minutes
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
-      }
-
-      const resData = await response.json();
       
+      const resData = res.data;
       const sessionNewPages = resData.totalPages;
       
       // Update state with new files and total page count
@@ -112,6 +117,7 @@ export default function Home() {
       alert(`Error uploading files: ${errorMsg}\n\nTarget API: ${targetUrl}\nTechnical details: ${err.code || 'Check console'}. Please ensure the backend is running and reachable.`);
     } finally {
       setIsUploading(false);
+      setUploadProgress(0);
     }
   };
 
@@ -218,7 +224,22 @@ export default function Home() {
             onFilesAdded={handleFilesAdded} 
             onFileRemove={handleFileRemove} 
           />
-          {isUploading && <p className="text-sm text-indigo-600 mt-2 animate-pulse">Uploading and processing PDFs...</p>}
+          {isUploading && (
+            <div className="mt-4 space-y-2">
+              <div className="w-full bg-gray-200 dark:bg-slate-800 rounded-full h-2.5 overflow-hidden">
+                <motion.div 
+                  initial={{ width: 0 }}
+                  animate={{ width: `${uploadProgress}%` }}
+                  className="bg-indigo-600 h-full transition-all duration-300"
+                />
+              </div>
+              <p className="text-sm font-medium text-indigo-600 dark:text-indigo-400 flex justify-between">
+                <span>{uploadProgress < 100 ? 'Uploading documents...' : 'Processing pages (Almost done)...'}</span>
+                <span>{uploadProgress}%</span>
+              </p>
+            </div>
+          )}
+          {apiStatus === 'checking' && <p className="text-sm text-gray-500 mt-2 animate-pulse flex items-center gap-2">🔄 Waking up printer server... (Taking ~30s)</p>}
         </section>
 
         {/* Print Settings */}
