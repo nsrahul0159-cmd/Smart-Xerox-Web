@@ -38,6 +38,10 @@ app.get('/', (req, res) => {
   res.send('Smart Xerox API is running!');
 });
 
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', message: 'Smart Xerox API is running!' });
+});
+
 // Database connection
 mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/smart-xerox')
   .then(() => {
