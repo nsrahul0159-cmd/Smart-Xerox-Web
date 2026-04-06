@@ -3,8 +3,9 @@ import mongoose from 'mongoose';
 const orderSchema = new mongoose.Schema({
   user: {
     name: { type: String, required: true },
-    phone: { type: String, required: true }
+    phone: { type: String, required: true, index: true }
   },
+  paymentToken: { type: String },
   files: [{
     originalName: { type: String, required: true },
     filename: { type: String, required: true },

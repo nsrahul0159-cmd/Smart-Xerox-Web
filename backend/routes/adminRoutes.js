@@ -1,10 +1,11 @@
 import express from 'express';
 import Order from '../models/Order.js';
+import { protectAdmin, generateToken } from '../utils/auth.js';
 
 const router = express.Router();
 
-// Fetch dashboard stats
-router.get('/stats', async (req, res) => {
+// Fetch dashboard stats (Protected)
+router.get('/stats', protectAdmin, async (req, res, next) => {
   try {
     const totalOrders = await Order.countDocuments();
     const pendingOrders = await Order.countDocuments({ status: { $in: ['Pending', 'Printing', 'Payment Pending'] } });
@@ -24,30 +25,35 @@ router.get('/stats', async (req, res) => {
       totalRevenue
     });
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch stats.' });
+    next(error);
   }
 });
 
-// Fetch all orders
-router.get('/orders', async (req, res) => {
+// Fetch all orders (Protected)
+router.get('/orders', protectAdmin, async (req, res, next) => {
   try {
     const orders = await Order.find().sort({ createdAt: -1 });
     res.status(200).json(orders);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch orders.' });
+    next(error);
   }
 });
 
-// Admin login (Simplified)
+// Admin login (Returns JWT)
 router.post('/login', (req, res) => {
   try {
     const { username, password } = req.body;
-    // For production, use environment variables!
+    
+    if (!process.env.ADMIN_USER || !process.env.ADMIN_PASS) {
+      console.warn("WARNING: Using default admin credentials due to missing env variables");
+    }
+
     const ADMIN_USER = process.env.ADMIN_USER || 'admin';
     const ADMIN_PASS = process.env.ADMIN_PASS || 'SmartXerox@2026';
 
     if (username === ADMIN_USER && password === ADMIN_PASS) {
-      res.status(200).json({ success: true, message: 'Logged in successfully' });
+      const token = generateToken('admin-user', 'admin');
+      res.status(200).json({ success: true, message: 'Logged in successfully', token });
     } else {
       res.status(401).json({ error: 'Invalid credentials' });
     }

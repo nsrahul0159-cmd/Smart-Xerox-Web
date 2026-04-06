@@ -18,15 +18,15 @@
     "cors": "^2.8.6",
     "dotenv": "^17.4.0",
     "express": "^5.2.1",
-    "fs": "^0.0.1-security",
+    "express-mongo-sanitize": "^2.2.0",
+    "express-rate-limit": "^8.3.2",
+    "helmet": "^8.1.0",
+    "joi": "^18.1.2",
     "jsonwebtoken": "^9.0.3",
-    "lib": "^5.1.0",
-    "module": "^2.0.0",
+    "mongodb": "^7.1.1",
     "mongoose": "^9.4.1",
     "multer": "^2.1.1",
-    "path": "^0.12.7",
     "pdf-lib": "^1.17.1",
-    "pdf-parse": "^2.4.5",
-    "url": "^0.11.4"
+    "pdf-parse": "^2.4.5"
   }
 }

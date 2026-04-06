@@ -152,7 +152,7 @@ export default function Home() {
     }
 
     try {
-      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/orders`, {
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL || '/api-backend'}/orders`, {
         user,
         files: uploadedFiles,
         totalPages,
@@ -170,8 +170,9 @@ export default function Home() {
     
     setIsProcessing(true);
     try {
-      await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/orders/${orderCreated._id}/status`, { 
-        status: 'Paid' 
+      await axios.put(`${process.env.NEXT_PUBLIC_API_URL || '/api-backend'}/orders/${orderCreated._id}/status`, { 
+        status: 'Paid',
+        paymentToken: orderCreated.paymentToken
       });
       setPaymentSuccess(true);
     } catch (err) {
