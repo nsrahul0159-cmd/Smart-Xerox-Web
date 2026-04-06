@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { RefreshCw, Users, FileText, CheckCircle, IndianRupee } from 'lucide-react';
+import { getApiUrl } from "@/lib/config";
 
 export default function AdminDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -33,8 +34,8 @@ export default function AdminDashboard() {
       const token = localStorage.getItem('adminToken');
       const headers = { Authorization: `Bearer ${token}` };
       
-      const statsRes = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || '/api-backend'}/admin/stats`, { headers });
-      const ordersRes = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || '/api-backend'}/admin/orders`, { headers });
+      const statsRes = await axios.get(`${getApiUrl()}/admin/stats`, { headers });
+      const ordersRes = await axios.get(`${getApiUrl()}/admin/orders`, { headers });
       
       setStats(statsRes.data);
       setOrders(ordersRes.data);
@@ -59,7 +60,7 @@ export default function AdminDashboard() {
     try {
       const token = localStorage.getItem('adminToken');
       const headers = { Authorization: `Bearer ${token}` };
-      await axios.put(`${process.env.NEXT_PUBLIC_API_URL || '/api-backend'}/orders/${id}/status`, { status: newStatus }, { headers });
+      await axios.put(`${getApiUrl()}/orders/${id}/status`, { status: newStatus }, { headers });
       fetchDashboardData(); // Refresh list
     } catch (err) {
       alert("Failed to update status");
@@ -73,7 +74,7 @@ export default function AdminDashboard() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL || '/api-backend'}/admin/login`, { username, password });
+      const res = await axios.post(`${getApiUrl()}/admin/login`, { username, password });
       if (res.data.success) {
         localStorage.setItem('adminToken', res.data.token);
         setIsAuthenticated(true);
@@ -215,7 +216,7 @@ export default function AdminDashboard() {
                 {col.files?.map((f: any, i: number) => (
                   <a 
                     key={i} 
-                    href={`${process.env.NEXT_PUBLIC_API_URL || '/api-backend'}/uploads/${f.filename}`} 
+                    href={`${getApiUrl()}/uploads/${f.filename}`} 
                     target="_blank" 
                     rel="noreferrer"
                     className="text-[10px] bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 px-2 py-1 rounded flex items-center gap-1 font-bold"
@@ -283,7 +284,7 @@ export default function AdminDashboard() {
                       {col.files?.map((f: any, i: number) => (
                         <a 
                           key={i} 
-                          href={`${process.env.NEXT_PUBLIC_API_URL || '/api-backend'}/uploads/${f.filename}`} 
+                          href={`${getApiUrl()}/uploads/${f.filename}`} 
                           target="_blank" 
                           rel="noreferrer"
                           className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1 font-bold bg-indigo-50 dark:bg-indigo-900/30 px-2 py-1 rounded w-max"

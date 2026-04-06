@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import axios from 'axios';
 import { QRCodeSVG } from 'qrcode.react';
+import { getApiUrl } from "@/lib/config";
 import FileUpload from "@/components/FileUpload";
 import PrintSettings from "@/components/PrintSettings";
 import AIOptimizerCard from "@/components/AIOptimizerCard";
@@ -33,7 +34,7 @@ export default function Home() {
     // Basic health check to see if we can reach the backend
     const checkApi = async (retries = 3) => {
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || '/api-backend';
+        const apiUrl = getApiUrl();
         console.log('Testing connection to:', apiUrl);
         // Hit the health-check path
         await axios.get(apiUrl);
@@ -76,7 +77,7 @@ export default function Home() {
     });
 
     try {
-      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL || '/api-backend'}/upload`, formData, {
+      const res = await axios.post(`${getApiUrl()}/upload`, formData, {
         onUploadProgress: (progressEvent) => {
           if (progressEvent.total) {
             const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
@@ -113,7 +114,7 @@ export default function Home() {
     } catch (err: any) {
       console.error(err);
       const errorMsg = err.response?.data?.error || err.message || 'Unknown error';
-      const targetUrl = process.env.NEXT_PUBLIC_API_URL || 'UNDEFINED';
+      const targetUrl = getApiUrl();
       alert(`Error uploading files: ${errorMsg}\n\nTarget API: ${targetUrl}\nTechnical details: ${err.code || 'Check console'}. Please ensure the backend is running and reachable.`);
     } finally {
       setIsUploading(false);
@@ -152,7 +153,7 @@ export default function Home() {
     }
 
     try {
-      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL || '/api-backend'}/orders`, {
+      const res = await axios.post(`${getApiUrl()}/orders`, {
         user,
         files: uploadedFiles,
         totalPages,
@@ -170,7 +171,7 @@ export default function Home() {
     
     setIsProcessing(true);
     try {
-      await axios.put(`${process.env.NEXT_PUBLIC_API_URL || '/api-backend'}/orders/${orderCreated._id}/status`, { 
+      await axios.put(`${getApiUrl()}/orders/${orderCreated._id}/status`, { 
         status: 'Paid',
         paymentToken: orderCreated.paymentToken
       });

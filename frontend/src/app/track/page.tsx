@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { Search, Loader2 } from 'lucide-react';
+import { getApiUrl } from "@/lib/config";
 
 export default function TrackOrder() {
   const [phone, setPhone] = useState('');
@@ -19,7 +20,7 @@ export default function TrackOrder() {
 
     setLoading(true);
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || '/api-backend';
+      const apiUrl = getApiUrl();
       const res = await axios.get(`${apiUrl}/orders/track/${phone}`);
       setOrders(res.data);
       setHasSearched(true);
