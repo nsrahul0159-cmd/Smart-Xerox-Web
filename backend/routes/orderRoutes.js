@@ -93,7 +93,7 @@ router.put('/:id/status', async (req, res, next) => {
        const jwt = (await import('jsonwebtoken')).default;
        try {
          const token = req.headers.authorization.split(' ')[1];
-         const decoded = jwt.verify(token, process.env.JWT_SECRET || 'super-secret-key-for-development');
+         const decoded = jwt.verify(token, process.env.JWT_SECRET);
          if (decoded.role === 'admin') isAdmin = true;
        } catch (e) {}
     }

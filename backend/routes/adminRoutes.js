@@ -44,14 +44,16 @@ router.post('/login', (req, res) => {
   try {
     const { username, password } = req.body;
     
-    if (!process.env.ADMIN_USER || !process.env.ADMIN_PASS) {
-      console.warn("WARNING: Using default admin credentials due to missing env variables");
+    // Strict env usage without unsafe hardcoded fallback strings
+    const adminUser = process.env.ADMIN_USERNAME;
+    const adminPass = process.env.ADMIN_PASSWORD;
+
+    if (!adminUser || !adminPass) {
+      console.error("CRITICAL ERROR: ADMIN_USERNAME or ADMIN_PASSWORD not set in environment variables!");
+      return res.status(500).json({ error: 'Server configuration error' });
     }
 
-    const ADMIN_USER = process.env.ADMIN_USER || 'admin';
-    const ADMIN_PASS = process.env.ADMIN_PASS || 'SmartXerox@2026';
-
-    if (username === ADMIN_USER && password === ADMIN_PASS) {
+    if (username === adminUser && password === adminPass) {
       const token = generateToken('admin-user', 'admin');
       res.status(200).json({ success: true, message: 'Logged in successfully', token });
     } else {

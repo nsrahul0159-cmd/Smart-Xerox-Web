@@ -7,7 +7,6 @@ import { fileURLToPath } from 'url';
 import fs from 'fs';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
-import mongoSanitize from 'express-mongo-sanitize';
 import { GridFSBucket } from 'mongodb';
 
 // Load env vars
@@ -37,7 +36,7 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);
 
-app.use(mongoSanitize()); // Prevent NoSQL Injection from req.body, req.query
+// NoSQL Injection protection natively handled via Joi validation schemas (e.g. orderRoutes.js)
 
 // CORS Config
 const allowedOrigins = process.env.FRONTEND_URL ? process.env.FRONTEND_URL.split(',') : ['http://localhost:3000', 'https://smart-xerox-web.onrender.com'];
