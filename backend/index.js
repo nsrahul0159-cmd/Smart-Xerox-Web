@@ -39,10 +39,18 @@ app.use('/api', limiter);
 // NoSQL Injection protection natively handled via Joi validation schemas (e.g. orderRoutes.js)
 
 // CORS Config
-const allowedOrigins = process.env.FRONTEND_URL ? process.env.FRONTEND_URL.split(',') : ['http://localhost:3000', 'https://smart-xerox-web.onrender.com'];
+const allowedOrigins = process.env.FRONTEND_URL 
+  ? process.env.FRONTEND_URL.split(',') 
+  : [
+      'http://localhost:3000', 
+      'https://smart-xerox-web.onrender.com',
+      'https://smart-xerox-web-git-main-nsrahul0159-4537s-projects.vercel.app'
+    ];
+
 app.use(cors({
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
+    // Allow if origin is in the allowed list, or if it's a Vercel preview branch
+    if (!origin || allowedOrigins.includes(origin) || (origin && origin.endsWith('.vercel.app'))) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
