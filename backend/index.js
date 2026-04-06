@@ -115,6 +115,36 @@ app.get('/api', (req, res) => {
   res.status(200).json({ message: 'Smart Xerox API is running securely!' });
 });
 
+// Health check endpoint for uptime monitoring
+app.get('/health', (req, res) => {
+  res.status(200).json({ 
+    status: 'OK', 
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
+    message: 'Server is healthy' 
+  });
+});
+
+// Root route
+app.get('/', (req, res) => {
+  res.send(`
+    <html>
+      <head><title>Smart Xerox API</title></head>
+      <body style="font-family: Arial, sans-serif; padding: 2rem; text-align: center;">
+        <h1 style="color: #4CAF50;">✅ Smart Xerox Backend is Running!</h1>
+        <p>The server is deployed and correctly configured.</p>
+        <p>API endpoints are available under <code>/api</code>.</p>
+        <p><a href="/health">Check Server Health</a></p>
+      </body>
+    </html>
+  `);
+});
+
+// Catch-all 404 handler for undefined routes
+app.use((req, res, next) => {
+  res.status(404).json({ error: 'Not Found', message: 'The requested route does not exist' });
+});
+
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ 
